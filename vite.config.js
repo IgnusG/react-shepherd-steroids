@@ -8,7 +8,10 @@ import { defineConfig } from "vite";
 export default defineConfig(({ command }) => ({
   root: command === "build" ? undefined : "example",
   plugins: [
-    pluginReactJSX(),
+    {
+      ...pluginReactJSX(),
+      apply: "build"
+    },
     {
       ...pluginDts(),
       apply: "build"
@@ -16,7 +19,7 @@ export default defineConfig(({ command }) => ({
   ],
   build: {
     lib: {
-      entry: path.resolve(__dirname, "lib/index.tsx"),
+      entry: path.resolve(__dirname, "lib/index.ts"),
       name: "react-shepherd-steroids",
     },
     rollupOptions: {

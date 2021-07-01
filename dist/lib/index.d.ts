@@ -45,8 +45,6 @@ interface TourProps {
  * - Hide on **removal** of element (but wait for it to re-appear then show again) via `hideOnUnmount=true` step option
  * - Keep on **removal** of element but update after it re-appears via `hideOnUnmount=true` (default) step option
  *
- * Due to some internal changes to the
- *
  * Check out the original documentation under [https://shepherdjs.dev/docs](https://shepherdjs.dev/docs/tutorial-02-usage.html)
  */
 export declare function ShepherdTour({ steps, tourOptions, children }: TourProps): JSX.Element;
