@@ -21,7 +21,9 @@ import "../lib/style.css";
 
 import { config, steps } from "./tour";
 
-function Flicker(props: PropsWithChildren<{ id: string; onDone?: () => void }>) {
+function Flicker(
+  props: PropsWithChildren<{ id: string; onDone?: () => void }>
+) {
   const [show, setShow] = useState(true);
   const counter = useRef(0);
 
@@ -130,18 +132,23 @@ function App() {
             )}
 
             {showThirdPart && (
-              <Flicker
-                id="flickering-show"
-              >
+              <Flicker id="flickering-show">
                 Okay it's happening everybody!
               </Flicker>
             )}
 
             {!finalPartComplete && (
-              <div className={tw("opacity-0 p-2 rounded-lg bg-red-400 text-white", css({
-                "[data-x-shepherd-marker=marker] &": apply("opacity-100")
-              }))}>
-                <span id="hidden-content">My parent would normally be hidden now</span>
+              <div
+                className={tw(
+                  "opacity-0 p-2 rounded-lg bg-red-400 text-white",
+                  css({
+                    "[data-x-shepherd-marker=marker] &": apply("opacity-100"),
+                  })
+                )}
+              >
+                <span id="hidden-content">
+                  My parent would normally be hidden now
+                </span>
               </div>
             )}
 

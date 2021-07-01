@@ -74,10 +74,10 @@ interface AdjustedShepherdProps {
   children: ReactChild;
 }
 
-const ShepherdTourComponent = _ShepherdTour as FunctionComponent<AdjustedShepherdProps>;
+const ShepherdTourComponent =
+  _ShepherdTour as FunctionComponent<AdjustedShepherdProps>;
 
-const ShepherdTourContext =
-  _ShepherdTourContext as Context<null | _Tour>;
+const ShepherdTourContext = _ShepherdTourContext as Context<null | _Tour>;
 
 interface TourProps {
   steps: Step[] | readonly Step[];
@@ -107,8 +107,8 @@ function createIsElementPresent(
         document.body.setAttribute(disableTransitionAttribute, "true");
         callbacks.show();
 
-        requestAnimationFrame(
-          () => document.body.removeAttribute(disableTransitionAttribute),
+        requestAnimationFrame(() =>
+          document.body.removeAttribute(disableTransitionAttribute)
         );
       }
 
@@ -145,7 +145,10 @@ function renderJSX(
 
 const markerAttribute = "data-x-shepherd-marker";
 
-function createTourStep(step: Step, tourOptions: TourOptions): _Step.StepOptions {
+function createTourStep(
+  step: Step,
+  tourOptions: TourOptions
+): _Step.StepOptions {
   let targetTracker: undefined | (() => void);
 
   return {
@@ -157,8 +160,7 @@ function createTourStep(step: Step, tourOptions: TourOptions): _Step.StepOptions
         const target = step.attachTo?.element;
         const marker = step.marker;
         const hideOnUnmount =
-          step.hideOnUnmount ??
-          tourOptions?.defaultStepOptions?.hideOnUnmount;
+          step.hideOnUnmount ?? tourOptions?.defaultStepOptions?.hideOnUnmount;
 
         const tour = this.getTour();
         const id = this.id;
@@ -224,21 +226,33 @@ function createTourStep(step: Step, tourOptions: TourOptions): _Step.StepOptions
  * - Gracefull wait if element cannot be find via `waitForElement=true` step option
  * - Hide on **removal** of element (but wait for it to re-appear then show again) via `hideOnUnmount=true` step option
  * - Keep on **removal** of element but update after it re-appears via `hideOnUnmount=true` (default) step option
- * 
+ *
  * Check out the original documentation under [https://shepherdjs.dev/docs](https://shepherdjs.dev/docs/tutorial-02-usage.html)
  */
-export function ShepherdTour({ steps, tourOptions, children }: TourProps): JSX.Element {
-  const adjustedSteps: AdjustedShepherdStepOptions[] = steps.map((step) => createTourStep(step, tourOptions));
+export function ShepherdTour({
+  steps,
+  tourOptions,
+  children,
+}: TourProps): JSX.Element {
+  const adjustedSteps: AdjustedShepherdStepOptions[] = steps.map((step) =>
+    createTourStep(step, tourOptions)
+  );
 
-  return createElement(ShepherdTourComponent, { steps: adjustedSteps, tourOptions: tourOptions as _Tour.TourOptions, children });
+  return createElement(ShepherdTourComponent, {
+    steps: adjustedSteps,
+    tourOptions: tourOptions as _Tour.TourOptions,
+    children,
+  });
 }
 
 export function useShepherdTour(): _Tour {
   const tour = useContext(ShepherdTourContext);
 
   if (tour === null) {
-    throw new Error("Shepherd has been requested outside of it's access - remember to wrap your app in <ShepherdTour>")
-  } 
+    throw new Error(
+      "Shepherd has been requested outside of it's access - remember to wrap your app in <ShepherdTour>"
+    );
+  }
 
   const originalAddStep = tour.addStep;
 
@@ -248,7 +262,7 @@ export function useShepherdTour(): _Tour {
     const step = createTourStep(options, tourOptions);
 
     return originalAddStep.call(tour, step, index);
-  }) as (typeof originalAddStep);
+  }) as typeof originalAddStep;
 
   return tour;
 }

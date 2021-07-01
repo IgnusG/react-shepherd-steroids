@@ -60,11 +60,11 @@ function Markers() {
 }
 `}
       </pre>
-
-      You can use the same marker for multiple steps to keep a parent styled in a certain way across them.
-
+      You can use the same marker for multiple steps to keep a parent styled in
+      a certain way across them.
       <blockquote className={blockquote}>
-        Once we have support for the <code>:has</code> relational selector we can simply do <code>:has(.shepherd-target)</code>
+        Once we have support for the <code>:has</code> relational selector we
+        can simply do <code>:has(.shepherd-target)</code>
       </blockquote>
     </Fragment>
   );
