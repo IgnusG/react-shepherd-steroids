@@ -8,10 +8,7 @@ import { defineConfig } from "vite";
 export default defineConfig(({ command }) => ({
   root: command === "build" ? undefined : "example",
   plugins: [
-    {
-      ...pluginReactJSX(),
-      apply: "example"
-    },
+    ...command !== "build" ? [pluginReactJSX()] : [],
     {
       ...pluginDts(),
       apply: "build"
