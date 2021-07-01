@@ -202,10 +202,7 @@ function createTourStep(
       hide(this: _Step): void {
         targetTracker?.();
         step?.when?.hide?.call(this);
-      },
-      complete(): void {
-        document.body.removeAttribute(markerAttribute);
-      },
+      }
     },
     async beforeShowPromise(this: Step): Promise<void> {
       const element = step.attachTo?.element;
@@ -245,6 +242,7 @@ export function ShepherdTour({
   });
 }
 
+/** Use `useShepherdTour()` instad of `useContext(ShepherdTourContext)` otherwise some of the included features might not work properly */
 export function useShepherdTour(): _Tour {
   const tour = useContext(ShepherdTourContext);
 
@@ -263,6 +261,15 @@ export function useShepherdTour(): _Tour {
 
     return originalAddStep.call(tour, step, index);
   }) as typeof originalAddStep;
+
+  // Remove our left-over marker attributes in case of sudden closure of tour
+  tour.on("complete", () => {
+    document.body.removeAttribute(markerAttribute);
+  });
+
+  tour.on("cancel", () => {
+    document.body.removeAttribute(markerAttribute);
+  });
 
   return tour;
 }
