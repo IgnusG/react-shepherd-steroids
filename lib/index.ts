@@ -85,6 +85,8 @@ interface TourProps {
   children: ReactChild;
 }
 
+const disableTransitionAttribute = "data-x-shepherd-disable-transitions";
+
 function createIsElementPresent(
   element: string,
   callbacks: { hide: () => void; show: () => void },
@@ -102,11 +104,11 @@ function createIsElementPresent(
       if (elementRemovedBefore && elementExists) {
         elementRemovedBefore = false;
 
-        document.body.setAttribute("data-tour-disable-transitions", "true");
+        document.body.setAttribute(disableTransitionAttribute, "true");
         callbacks.show();
 
         requestAnimationFrame(
-          () => document.body.removeAttribute("data-tour-disable-transitions"),
+          () => document.body.removeAttribute(disableTransitionAttribute),
         );
       }
 
@@ -141,6 +143,8 @@ function renderJSX(
   if (root) render(component, root);
 }
 
+const markerAttribute = "data-x-shepherd-marker";
+
 function createTourStep(step: Step, tourOptions: TourOptions): _Step.StepOptions {
   let targetTracker: undefined | (() => void);
 
@@ -160,7 +164,8 @@ function createTourStep(step: Step, tourOptions: TourOptions): _Step.StepOptions
         const id = this.id;
         const container = (this as StepInstance).el;
 
-        if (marker) document.body.setAttribute("data-tour-marker", marker);
+        if (marker) document.body.setAttribute(markerAttribute, marker);
+        else document.body.removeAttribute(markerAttribute);
 
         targetTracker?.();
 
@@ -197,7 +202,7 @@ function createTourStep(step: Step, tourOptions: TourOptions): _Step.StepOptions
         step?.when?.hide?.call(this);
       },
       complete(): void {
-        document.body.removeAttribute("data-tour-marker");
+        document.body.removeAttribute(markerAttribute);
       },
     },
     async beforeShowPromise(this: Step): Promise<void> {

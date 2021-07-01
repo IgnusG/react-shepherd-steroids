@@ -47,7 +47,7 @@ interface TourProps {
  *
  * Check out the original documentation under [https://shepherdjs.dev/docs](https://shepherdjs.dev/docs/tutorial-02-usage.html)
  */
-export declare function ShepherdTour({ steps, tourOptions, children }: TourProps): JSX.Element;
+export declare function ShepherdTour({ steps, tourOptions, children, }: TourProps): JSX.Element;
 export declare function useShepherdTour(): _Tour;
 /** Returns back a tuple `[currentMarker, isTourActive]`. Re-renders with updated values if required */
 export declare function useShepherdTourMarker(): [string | undefined, boolean];
