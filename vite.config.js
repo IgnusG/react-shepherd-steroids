@@ -10,7 +10,7 @@ export default defineConfig(({ command }) => ({
   plugins: [
     {
       ...pluginReactJSX(),
-      apply: "build"
+      apply: "example"
     },
     {
       ...pluginDts(),
@@ -26,8 +26,8 @@ export default defineConfig(({ command }) => ({
       external: ["react", "react-dom"],
       output: {
         globals: {
-          react: "react",
-          ["react-dom"]: "react-dom",
+          react: "React",
+          ["react-dom"]: "ReactDOM",
         },
       },
     },
