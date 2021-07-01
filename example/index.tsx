@@ -1,5 +1,7 @@
 // @ts-expect-error
 import { tw } from "https://cdn.skypack.dev/twind";
+// @ts-expect-error
+import { css, apply } from "https://cdn.skypack.dev/twind/css";
 
 import {
   useEffect,
@@ -62,8 +64,11 @@ function App() {
     tour.start();
 
     tour.on("show", (e: TourEventProps) => {
-      if (e.step.id === "last") {
+      if (e.step.id === "markers") {
         setShowThirdPart(false);
+      }
+
+      if (e.step.id === "last") {
         setFinalPartComplete(true);
       }
     });
@@ -130,6 +135,14 @@ function App() {
               >
                 Okay it's happening everybody!
               </Flicker>
+            )}
+
+            {!finalPartComplete && (
+              <div className={tw("opacity-0 p-2 rounded-lg bg-red-400 text-white", css({
+                "[data-x-shepherd-marker=marker] &": apply("opacity-100")
+              }))}>
+                <span id="hidden-content">My parent would normally be hidden now</span>
+              </div>
             )}
 
             {finalPartComplete && (
