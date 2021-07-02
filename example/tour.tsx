@@ -70,8 +70,25 @@ function Markers() {
   );
 }
 
+function AdvanceOn() {
+  return (
+    <Fragment>
+      <p className={tw("mb-3")}>
+        You can also use <code>advanceOn</code> to jump to a specific step. This
+        way you can conditionally control your component with purely declarative
+        tours (aka. you can load them remotely).
+      </p>
+      <p className={tw("mb-3")}>
+        Just click on the text below (this will go back to the first tour step -
+        sorry)
+      </p>
+    </Fragment>
+  );
+}
+
 export const steps: Steps = [
   {
+    id: "taste-the-rainbow",
     attachTo: { element: "#title", on: "top" },
     text: <RainbowJSXMessage />,
     buttons: [
@@ -139,6 +156,23 @@ export const steps: Steps = [
           this.next();
         },
         text: "Next",
+      },
+    ],
+  },
+  {
+    title: "Again?",
+    text: <AdvanceOn />,
+    attachTo: { element: "#restart", on: "top" },
+    advanceOn: {
+      event: "click",
+      goTo: "taste-the-rainbow",
+    },
+    buttons: [
+      {
+        action(): void {
+          this.next();
+        },
+        text: "Next - Just one more thing",
       },
     ],
   },

@@ -49,7 +49,7 @@ function Flicker(
   );
 }
 
-const buttonStyles = tw("py-2 px-4 bg-blue-500 text-white rounded my-2");
+const buttonStyles = tw("my-2 px-4 py-2 text-white bg-blue-500 rounded");
 
 function App() {
   const [showFirstPart, setShowFirstPart] = useState(false);
@@ -58,6 +58,8 @@ function App() {
   const secondPartComplete = useRef(false);
 
   const [showThirdPart, setShowThirdPart] = useState(false);
+  const [showFourthPart, setShowFourthPart] = useState(false);
+
   const [finalPartComplete, setFinalPartComplete] = useState(false);
 
   const tour = useShepherdTour();
@@ -65,24 +67,53 @@ function App() {
   useEffect(() => {
     tour.start();
 
-    tour.on("show", (e: TourEventProps) => {
+    function handleTourShow(e: TourEventProps) {
+      if (e.step.id === "taste-the-rainbow") {
+        setShowFirstPart(false);
+        setShowSecondPart(false);
+        secondPartComplete.current = false;
+        setShowThirdPart(false);
+        setShowFourthPart(false);
+      }
+
       if (e.step.id === "markers") {
         setShowThirdPart(false);
+        setShowFourthPart(true);
       }
 
       if (e.step.id === "last") {
         setFinalPartComplete(true);
+
+        setShowFirstPart(false);
+        setShowSecondPart(false);
+        secondPartComplete.current = false;
+        setShowThirdPart(false);
+        setShowFourthPart(false);
       }
-    });
+    }
+
+    tour.on("show", handleTourShow);
+
+    return () => {
+      tour.complete();
+      tour.off("show", handleTourShow);
+    };
   }, []);
 
   return (
     <main
       className={tw(
-        "w-screen h-screen flex items-center justify-center bg-gray-100"
+        "flex items-center justify-center w-screen h-screen bg-gray-100",
+        css({
+          ":global": {
+            ".shepherd-has-title .shepherd-content .shepherd-header": apply(
+              "py-2! bg-white! px-3!"
+            ),
+          },
+        })
       )}
     >
-      <div className={tw("w-[50ch] flex justify-center flex-col")}>
+      <div className={tw("w-[50ch] flex flex-col justify-center")}>
         <h1 id="title" className={tw("p-3 text-3xl")}>
           Hello!
         </h1>
@@ -91,7 +122,11 @@ function App() {
         <button
           id="more-content"
           className={buttonStyles}
-          onClick={() => setTimeout(() => setShowFirstPart(true), 1000)}
+          onClick={() => {
+            tour.start();
+
+            setTimeout(() => setShowFirstPart(true), 1000);
+          }}
         >
           Show more information (with a slight delay)
         </button>
@@ -105,7 +140,7 @@ function App() {
               </a>
             </p>
 
-            {finalPartComplete || (
+            {
               <button
                 id="disappearing-toggle"
                 className={buttonStyles}
@@ -116,7 +151,7 @@ function App() {
               >
                 Toggle the counter bellow to flicker
               </button>
-            )}
+            }
 
             {showSecondPart && (
               <Flicker
@@ -137,10 +172,12 @@ function App() {
               </Flicker>
             )}
 
+            {showFourthPart && <p id="restart">God this is so boring...</p>}
+
             {!finalPartComplete && (
               <div
                 className={tw(
-                  "opacity-0 p-2 rounded-lg bg-red-400 text-white",
+                  "p-2 text-white bg-red-400 rounded-lg opacity-0",
                   css({
                     "[data-x-shepherd-marker=marker] &": apply("opacity-100"),
                   })
@@ -151,17 +188,17 @@ function App() {
                 </span>
               </div>
             )}
-
-            {finalPartComplete && (
-              <p>
-                Check out the base documentation for shepherd to learn how to
-                use all the originally built-in functions:{" "}
-                <a href="https://shepherdjs.dev/docs/tutorial-02-usage.html">
-                  https://shepherdjs.dev/docs
-                </a>
-              </p>
-            )}
           </Fragment>
+        )}
+
+        {finalPartComplete && (
+          <p>
+            Check out the base documentation for shepherd to learn how to use
+            all the originally built-in functions:{" "}
+            <a href="https://shepherdjs.dev/docs/tutorial-02-usage.html">
+              https://shepherdjs.dev/docs
+            </a>
+          </p>
         )}
       </div>
     </main>
