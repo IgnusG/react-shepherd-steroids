@@ -1,6 +1,7 @@
 import path from "path";
 
 import pluginReactJSX from "vite-react-jsx";
+import pluginReactFastRefresh from "@vitejs/plugin-react-refresh";
 import pluginDts from "vite-plugin-dts";
 
 import { defineConfig } from "vite";
@@ -8,7 +9,7 @@ import { defineConfig } from "vite";
 export default defineConfig(({ command }) => ({
   root: command === "build" ? undefined : "example",
   plugins: [
-    ...command !== "build" ? [pluginReactJSX()] : [],
+    ...command !== "build" ? [pluginReactJSX(), pluginReactFastRefresh()] : [],
     {
       ...pluginDts(),
       apply: "build"
