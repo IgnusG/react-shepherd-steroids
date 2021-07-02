@@ -13,6 +13,7 @@ import {
   useContext,
   useState,
   useEffect,
+  useMemo,
 } from "react";
 
 import { createElement } from "react";
@@ -41,6 +42,11 @@ interface When {
   hide?: (this: _Step) => void;
 }
 
+interface AdvanceOn extends _Step.StepOptionsAdvanceOn {
+  goTo?: string;
+  event: string;
+}
+
 export interface Step
   extends Omit<_Step.StepOptions, "when" | "text" | "title"> {
   marker?: string;
@@ -51,6 +57,7 @@ export interface Step
   hideOnUnmount?: boolean;
   text: string | JSX.Element;
   title?: string | JSX.Element;
+  advanceOn?: AdvanceOn;
 }
 
 export type Steps = Step[] | readonly Step[];
@@ -62,6 +69,7 @@ export interface TourOptions
 
 interface Tour extends _Tour {
   options: TourOptions;
+  restart(): void;
 }
 
 interface AdjustedShepherdStepOptions extends _Step.StepOptions {
@@ -150,6 +158,9 @@ function createTourStep(
   tourOptions: TourOptions
 ): _Step.StepOptions {
   let targetTracker: undefined | (() => void);
+  
+  let handleGoToTarget: Element; 
+  let handleGoTo: () => void;
 
   return {
     ...step,
@@ -197,10 +208,31 @@ function createTourStep(
           targetTracker = stopTrackingTarget;
         }
 
+        if (step.advanceOn) {
+          const targetSelector = step.advanceOn.selector ?? step.attachTo?.element;
+          
+          handleGoToTarget = (typeof targetSelector === "string" ? document.querySelector(targetSelector) : targetSelector) ?? document.body;
+      
+          handleGoTo = () => {
+            if (step.advanceOn?.goTo)
+              return tour.show(step.advanceOn?.goTo);
+
+            // Shepherd does not support empty selectors - we default to the target element or body if target is not defined
+            if (!step.advanceOn?.selector)
+              return tour.next();
+          };
+
+          handleGoToTarget.addEventListener(step.advanceOn.event, handleGoTo);
+        }
+
         step?.when?.show?.call(this);
       },
       hide(this: _Step): void {
         targetTracker?.();
+
+        if (step.advanceOn)
+          handleGoToTarget?.removeEventListener(step.advanceOn.event, handleGoTo);
+
         step?.when?.hide?.call(this);
       }
     },
@@ -223,6 +255,8 @@ function createTourStep(
  * - Gracefull wait if element cannot be find via `waitForElement=true` step option
  * - Hide on **removal** of element (but wait for it to re-appear then show again) via `hideOnUnmount=true` step option
  * - Keep on **removal** of element but update after it re-appears via `hideOnUnmount=true` (default) step option
+ * - Add "markers" to steps for custom css styling `[data-x-shepherd-marker="my-marker"] .parent`
+ * - Support `goTo` for the declarative `advanceOn` option (remote flow control)
  *
  * Check out the original documentation under [https://shepherdjs.dev/docs](https://shepherdjs.dev/docs/tutorial-02-usage.html)
  */
@@ -231,9 +265,9 @@ export function ShepherdTour({
   tourOptions,
   children,
 }: TourProps): JSX.Element {
-  const adjustedSteps: AdjustedShepherdStepOptions[] = steps.map((step) =>
+  const adjustedSteps: AdjustedShepherdStepOptions[] = useMemo(() => steps.map((step) =>
     createTourStep(step, tourOptions)
-  );
+  ), [steps, tourOptions]);
 
   return createElement(ShepherdTourComponent, {
     steps: adjustedSteps,
@@ -243,8 +277,8 @@ export function ShepherdTour({
 }
 
 /** Use `useShepherdTour()` instad of `useContext(ShepherdTourContext)` otherwise some of the included features might not work properly */
-export function useShepherdTour(): _Tour {
-  const tour = useContext(ShepherdTourContext);
+export function useShepherdTour(): Tour {
+  const tour = useContext(ShepherdTourContext) as Tour;
 
   if (tour === null) {
     throw new Error(
@@ -252,24 +286,52 @@ export function useShepherdTour(): _Tour {
     );
   }
 
-  const originalAddStep = tour.addStep;
+  useEffect(() => {
+    let restartWarningGiven = false;
 
-  tour.addStep = ((options: Step, index?: number | undefined): _Step => {
-    const tourOptions = (tour as Tour).options;
+    const originalCancel = tour.cancel;
+    const originalAddStep = tour.addStep;
+    const originalStart = tour.start;
 
-    const step = createTourStep(options, tourOptions);
+    tour.addStep = ((options: Step, index?: number | undefined): _Step => {
+      const tourOptions = (tour as Tour).options;
 
-    return originalAddStep.call(tour, step, index);
-  }) as typeof originalAddStep;
+      const step = createTourStep(options, tourOptions);
 
-  // Remove our left-over marker attributes in case of sudden closure of tour
-  tour.on("complete", () => {
-    document.body.removeAttribute(markerAttribute);
-  });
+      return originalAddStep.call(tour, step, index);
+    }) as typeof originalAddStep;
 
-  tour.on("cancel", () => {
-    document.body.removeAttribute(markerAttribute);
-  });
+    tour.start = () => {
+      if (tour.isActive()) {
+        if (!restartWarningGiven) {
+          restartWarningGiven = true;
+          console.warn("A tour is already active - if you want to restart it use tour.restart");
+        }
+
+        return;
+      }
+
+      return originalStart.call(tour);
+    }
+
+    tour.restart = () => {
+      if (tour.isActive()) {
+        originalCancel.call(tour);
+        originalStart.call(tour);
+      } else {
+        originalStart.call(tour);
+      }
+    }
+
+    // Remove our left-over marker attributes in case of sudden closure of tour
+    tour.on("complete", () => {
+      document.body.removeAttribute(markerAttribute);
+    });
+
+    tour.on("cancel", () => {
+      document.body.removeAttribute(markerAttribute);
+    });
+  }, [tour]);
 
   return tour;
 }
