@@ -1,10 +1,10 @@
-import path from "path";
-
-import pluginReactJSX from "vite-react-jsx";
 import pluginReactFastRefresh from "@vitejs/plugin-react-refresh";
-import pluginDts from "vite-plugin-dts";
-
+import path from "path";
 import { defineConfig } from "vite";
+import pluginDts from "vite-plugin-dts";
+import pluginReactJSX from "vite-react-jsx";
+
+
 
 export default defineConfig(({ command }) => ({
   root: command === "build" ? undefined : "example",
@@ -21,7 +21,7 @@ export default defineConfig(({ command }) => ({
       name: "react-shepherd-steroids",
     },
     rollupOptions: {
-      external: ["react", "react-dom"],
+      external: ["react", "react-dom", "react-shepherd"],
       output: {
         globals: {
           react: "React",
