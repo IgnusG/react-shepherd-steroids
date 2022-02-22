@@ -17,7 +17,8 @@
   },
   "types": "./dist/lib/index.d.ts",
   "scripts": {
-    "example": "vite serve",
+    "dev-example": "vite serve -c vite-example.config.js",
+    "build-example": "vite build -c vite-example.config.js",
     "build": "vite build"
   },
   "devDependencies": {

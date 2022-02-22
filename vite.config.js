@@ -1,18 +1,11 @@
-import pluginReactFastRefresh from "@vitejs/plugin-react-refresh";
 import path from "path";
 import { defineConfig } from "vite";
 import pluginDts from "vite-plugin-dts";
-import pluginReactJSX from "vite-react-jsx";
 
-
-
-export default defineConfig(({ command }) => ({
-  root: command === "build" ? undefined : "example",
+export default defineConfig(() => ({
   plugins: [
-    ...command !== "build" ? [pluginReactJSX(), pluginReactFastRefresh()] : [],
     {
       ...pluginDts(),
-      apply: "build"
     }
   ],
   build: {
