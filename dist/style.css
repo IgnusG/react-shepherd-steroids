@@ -1,1 +1,1 @@
-[data-tour-disable-transitions=true] .shepherd-element.shepherd-enabled *,[data-x-shepherd-disable-transitions=true] .shepherd-element.shepherd-enabled{transition:none!important}
+[data-x-shepherd-disable-transitions=true] .shepherd-element.shepherd-enabled,[data-tour-disable-transitions=true] .shepherd-element.shepherd-enabled *{transition:none!important}
